@@ -1,0 +1,74 @@
+<script setup lang="ts">
+import { onMounted, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useFamilyStore } from '@/stores/familyStore';
+import { useAccountsStore } from '@/stores/accountsStore';
+import { useTransactionsStore } from '@/stores/transactionsStore';
+import { useAssetsStore } from '@/stores/assetsStore';
+import { useGoalsStore } from '@/stores/goalsStore';
+import { useSettingsStore } from '@/stores/settingsStore';
+import AppSidebar from '@/components/common/AppSidebar.vue';
+import AppHeader from '@/components/common/AppHeader.vue';
+
+const route = useRoute();
+const router = useRouter();
+const familyStore = useFamilyStore();
+const accountsStore = useAccountsStore();
+const transactionsStore = useTransactionsStore();
+const assetsStore = useAssetsStore();
+const goalsStore = useGoalsStore();
+const settingsStore = useSettingsStore();
+
+const showLayout = computed(() => {
+  // Don't show sidebar/header on setup page
+  return route.name !== 'Setup' && route.name !== 'NotFound';
+});
+
+onMounted(async () => {
+  // Load all data on app mount
+  await Promise.all([
+    familyStore.loadMembers(),
+    settingsStore.loadSettings(),
+  ]);
+
+  // Check if setup is needed
+  if (!familyStore.isSetupComplete && route.name !== 'Setup') {
+    router.replace('/setup');
+    return;
+  }
+
+  // Load remaining data if setup is complete
+  if (familyStore.isSetupComplete) {
+    await Promise.all([
+      accountsStore.loadAccounts(),
+      transactionsStore.loadTransactions(),
+      assetsStore.loadAssets(),
+      goalsStore.loadGoals(),
+    ]);
+  }
+});
+</script>
+
+<template>
+  <div class="min-h-screen bg-gray-50 dark:bg-slate-900">
+    <div v-if="showLayout" class="flex">
+      <AppSidebar />
+
+      <div class="flex-1 flex flex-col">
+        <AppHeader>
+          <template #title>
+            {{ route.meta.title }}
+          </template>
+        </AppHeader>
+
+        <main class="flex-1 p-6 overflow-auto">
+          <router-view />
+        </main>
+      </div>
+    </div>
+
+    <div v-else>
+      <router-view />
+    </div>
+  </div>
+</template>

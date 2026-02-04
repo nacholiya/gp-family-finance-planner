@@ -1,0 +1,225 @@
+# GP Family Financial Planner
+
+## Project Overview
+
+A local-first, PWA-enabled family financial planning application. The app allows families to track accounts, transactions, assets, and financial goals with multi-currency support and optional encrypted cloud sync to Google Drive.
+
+## Technology Stack
+
+- **Framework**: Vue 3.5+ (Composition API)
+- **Build Tool**: Vite 6.0+
+- **Language**: TypeScript 5.6+
+- **State Management**: Pinia 2.2+
+- **Routing**: Vue Router 4.4+
+- **Styling**: Tailwind CSS 4.0
+- **Charts**: Chart.js 4.4+ / vue-chartjs 5.3+
+- **Local Storage**: IndexedDB (via idb 8.0+)
+- **PWA**: vite-plugin-pwa 0.20+
+- **Encryption**: Web Crypto API (native)
+
+## Project Structure
+
+```
+gp-family-finance-planner/
+├── public/
+│   └── icons/                     # PWA icons
+├── src/
+│   ├── components/
+│   │   ├── common/                # AppHeader, AppSidebar
+│   │   ├── ui/                    # BaseButton, BaseCard, BaseInput, BaseModal, BaseSelect
+│   │   ├── forms/                 # Form components (future)
+│   │   ├── charts/                # Chart components (future)
+│   │   ├── dashboard/             # Dashboard widgets (future)
+│   │   └── family/                # Family-related components (future)
+│   ├── composables/               # Vue composables (future)
+│   ├── constants/
+│   │   ├── categories.ts          # Income/expense categories
+│   │   └── currencies.ts          # Supported currencies
+│   ├── pages/
+│   │   ├── DashboardPage.vue      # Main dashboard
+│   │   ├── AccountsPage.vue       # Bank accounts management
+│   │   ├── TransactionsPage.vue   # Transaction tracking
+│   │   ├── AssetsPage.vue         # Asset tracking
+│   │   ├── GoalsPage.vue          # Financial goals
+│   │   ├── ReportsPage.vue        # Charts and reports
+│   │   ├── ForecastPage.vue       # Financial projections
+│   │   ├── FamilyPage.vue         # Family member management
+│   │   ├── SettingsPage.vue       # App settings
+│   │   ├── SetupPage.vue          # First-run wizard
+│   │   └── NotFoundPage.vue       # 404 page
+│   ├── router/
+│   │   └── index.ts               # Route definitions
+│   ├── services/
+│   │   ├── indexeddb/
+│   │   │   ├── database.ts        # DB initialization
+│   │   │   └── repositories/      # CRUD for each entity
+│   │   ├── google/                # Google OAuth & Drive (future)
+│   │   ├── crypto/                # Encryption services (future)
+│   │   ├── sync/                  # Sync management (future)
+│   │   └── ai/                    # AI integration (future)
+│   ├── stores/
+│   │   ├── familyStore.ts         # Family members state
+│   │   ├── accountsStore.ts       # Accounts state
+│   │   ├── transactionsStore.ts   # Transactions state
+│   │   ├── assetsStore.ts         # Assets state
+│   │   ├── goalsStore.ts          # Goals state
+│   │   └── settingsStore.ts       # App settings state
+│   ├── types/
+│   │   └── models.ts              # TypeScript interfaces
+│   ├── utils/
+│   │   ├── date.ts                # Date utilities
+│   │   └── id.ts                  # UUID generation
+│   ├── App.vue                    # Root component
+│   ├── main.ts                    # Entry point
+│   └── style.css                  # Global styles (Tailwind)
+├── index.html
+├── vite.config.ts
+├── postcss.config.js
+├── tsconfig.json
+└── CLAUDE.md
+```
+
+## Data Models
+
+### FamilyMember
+- `id`: UUID
+- `name`: string
+- `email`: string (unique)
+- `role`: 'owner' | 'admin' | 'member'
+- `color`: string (UI differentiation)
+- Timestamps: createdAt, updatedAt
+
+### Account
+- `id`: UUID
+- `memberId`: UUID (FK to FamilyMember)
+- `name`: string
+- `type`: 'checking' | 'savings' | 'credit_card' | 'investment' | 'crypto' | 'cash' | 'loan' | 'other'
+- `currency`: CurrencyCode
+- `balance`: number
+- `institution`: string (optional)
+- `isActive`: boolean
+- `includeInNetWorth`: boolean
+- Timestamps: createdAt, updatedAt
+
+### Transaction
+- `id`: UUID
+- `accountId`: UUID (FK to Account)
+- `toAccountId`: UUID (optional, for transfers)
+- `type`: 'income' | 'expense' | 'transfer'
+- `amount`: number
+- `currency`: CurrencyCode
+- `category`: string
+- `date`: ISODateString
+- `description`: string
+- `recurring`: RecurringConfig (optional)
+- `isReconciled`: boolean
+- Timestamps: createdAt, updatedAt
+
+### Asset
+- `id`: UUID
+- `memberId`: UUID (FK to FamilyMember)
+- `type`: 'real_estate' | 'vehicle' | 'investment' | 'crypto' | 'collectible' | 'other'
+- `name`: string
+- `purchaseValue`: number
+- `currentValue`: number
+- `currency`: CurrencyCode
+- `includeInNetWorth`: boolean
+- Timestamps: createdAt, updatedAt
+
+### Goal
+- `id`: UUID
+- `memberId`: UUID (optional, null = family-wide)
+- `name`: string
+- `type`: 'savings' | 'debt_payoff' | 'investment' | 'purchase'
+- `targetAmount`: number
+- `currentAmount`: number
+- `currency`: CurrencyCode
+- `deadline`: ISODateString (optional)
+- `priority`: 'low' | 'medium' | 'high' | 'critical'
+- `isCompleted`: boolean
+- Timestamps: createdAt, updatedAt
+
+### Settings
+- `id`: 'app_settings' (singleton)
+- `baseCurrency`: CurrencyCode
+- `exchangeRates`: ExchangeRate[]
+- `theme`: 'light' | 'dark' | 'system'
+- `syncEnabled`: boolean
+- `aiProvider`: 'claude' | 'openai' | 'gemini' | 'none'
+- `aiApiKeys`: { claude?, openai?, gemini? }
+- Timestamps: createdAt, updatedAt
+
+## Development Commands
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Type check
+npm run type-check
+
+# Lint
+npm run lint
+```
+
+## Key Implementation Details
+
+1. **Local-First Architecture**: All data stored in IndexedDB using the `idb` library
+2. **Multi-Currency**: Amounts stored with original currency, converted on-demand for display
+3. **Family Profiles**: Each member has their own accounts/transactions, with shared family goals
+4. **PWA Ready**: Service worker and manifest configured for offline support
+5. **Privacy-Focused**: Data never leaves device unless user enables Google Drive sync
+6. **Theme Support**: Light/dark mode with system preference detection
+
+## Code Conventions
+
+- **Components**: PascalCase (e.g., `BaseButton.vue`)
+- **Files**: camelCase for TypeScript, kebab-case for Vue pages
+- **Stores**: Use Pinia composition API style
+- **Types**: Centralized in `src/types/models.ts`
+- **CSS**: Tailwind utility classes, custom CSS variables for theming
+
+## Current Status (MVP - Phase 1)
+
+Implemented:
+- [x] Project scaffold with Vite + Vue 3 + TypeScript
+- [x] IndexedDB service with repositories
+- [x] Pinia stores for all entities
+- [x] Vue Router with all page routes
+- [x] UI component library (Button, Card, Input, Modal, Select)
+- [x] Dashboard with summary cards
+- [x] Accounts management (CRUD)
+- [x] Transactions management (CRUD)
+- [x] Goals management (CRUD)
+- [x] Family member management
+- [x] Settings page (currency, theme)
+- [x] First-run setup wizard
+- [x] Dark mode support
+
+Pending (Future Phases):
+- [ ] Google Drive encrypted sync
+- [ ] PWA offline support
+- [ ] Charts and reports
+- [ ] Financial forecasting
+- [ ] AI-powered insights
+- [ ] Data import/export
+- [ ] Recurring transactions
+
+## Notes for AI Assistants
+
+- This is a Phase 1 MVP - prioritize core functionality
+- All data operations go through Pinia stores -> IndexedDB repositories
+- Use existing UI components from `src/components/ui/`
+- Follow Vue 3 Composition API patterns
+- Maintain TypeScript type safety
+- Use Tailwind CSS for styling
+- Test changes with `npm run dev`
