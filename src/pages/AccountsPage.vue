@@ -5,14 +5,28 @@ import { useFamilyStore } from '@/stores/familyStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { BaseCard, BaseButton, BaseInput, BaseSelect, BaseModal } from '@/components/ui';
 import { formatCurrency, CURRENCIES } from '@/constants/currencies';
-import type { AccountType, CreateAccountInput } from '@/types/models';
+import type { Account, AccountType, CreateAccountInput, UpdateAccountInput } from '@/types/models';
 
 const accountsStore = useAccountsStore();
 const familyStore = useFamilyStore();
 const settingsStore = useSettingsStore();
 
 const showAddModal = ref(false);
+const showEditModal = ref(false);
 const isSubmitting = ref(false);
+
+// Editing state
+const editingAccountId = ref<string | null>(null);
+const editingAccount = ref<UpdateAccountInput & { name: string; balance: number; memberId: string }>({
+  name: '',
+  balance: 0,
+  memberId: '',
+  type: 'checking',
+  currency: 'USD',
+  institution: '',
+  isActive: true,
+  includeInNetWorth: true,
+});
 
 const accountTypes: { value: AccountType; label: string }[] = [
   { value: 'checking', label: 'Checking Account' },
@@ -29,6 +43,14 @@ const currencyOptions = CURRENCIES.map((c) => ({
   value: c.code,
   label: `${c.code} - ${c.name}`,
 }));
+
+// Family member options for the owner selector
+const memberOptions = computed(() =>
+  familyStore.members.map((m) => ({
+    value: m.id,
+    label: m.name,
+  }))
+);
 
 const newAccount = ref<CreateAccountInput>({
   memberId: familyStore.currentMemberId || '',
@@ -51,6 +73,16 @@ function getAccountTypeLabel(type: AccountType): string {
   return accountTypes.find((t) => t.value === type)?.label || type;
 }
 
+function getMemberName(memberId: string): string {
+  const member = familyStore.members.find((m) => m.id === memberId);
+  return member?.name || 'Unknown';
+}
+
+function getMemberColor(memberId: string): string {
+  const member = familyStore.members.find((m) => m.id === memberId);
+  return member?.color || '#6b7280';
+}
+
 function openAddModal() {
   newAccount.value = {
     memberId: familyStore.currentMemberId || '',
@@ -65,6 +97,26 @@ function openAddModal() {
   showAddModal.value = true;
 }
 
+function openEditModal(account: Account) {
+  editingAccountId.value = account.id;
+  editingAccount.value = {
+    name: account.name,
+    balance: account.balance,
+    memberId: account.memberId,
+    type: account.type,
+    currency: account.currency,
+    institution: account.institution || '',
+    isActive: account.isActive,
+    includeInNetWorth: account.includeInNetWorth,
+  };
+  showEditModal.value = true;
+}
+
+function closeEditModal() {
+  showEditModal.value = false;
+  editingAccountId.value = null;
+}
+
 async function createAccount() {
   if (!newAccount.value.name.trim()) return;
 
@@ -72,6 +124,18 @@ async function createAccount() {
   try {
     await accountsStore.createAccount(newAccount.value);
     showAddModal.value = false;
+  } finally {
+    isSubmitting.value = false;
+  }
+}
+
+async function saveEdit() {
+  if (!editingAccountId.value || !editingAccount.value.name.trim()) return;
+
+  isSubmitting.value = true;
+  try {
+    await accountsStore.updateAccount(editingAccountId.value, editingAccount.value);
+    closeEditModal();
   } finally {
     isSubmitting.value = false;
   }
@@ -143,17 +207,37 @@ async function deleteAccount(id: string) {
                 {{ getAccountTypeLabel(account.type) }}
                 <span v-if="account.institution"> - {{ account.institution }}</span>
               </p>
+              <div class="flex items-center gap-1.5 mt-1">
+                <div
+                  class="w-3 h-3 rounded-full"
+                  :style="{ backgroundColor: getMemberColor(account.memberId) }"
+                />
+                <span class="text-xs text-gray-400 dark:text-gray-500">{{ getMemberName(account.memberId) }}</span>
+              </div>
             </div>
           </div>
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
             <span
               class="text-lg font-semibold"
               :class="account.type === 'credit_card' || account.type === 'loan' ? 'text-red-600' : 'text-green-600'"
             >
               {{ formatMoney(account.balance, account.currency) }}
             </span>
+            <!-- Edit button -->
+            <button
+              data-testid="edit-account-btn"
+              class="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
+              title="Edit account"
+              @click="openEditModal(account)"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <!-- Delete button -->
             <button
               class="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700"
+              title="Delete account"
               @click="deleteAccount(account.id)"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,6 +269,12 @@ async function deleteAccount(id: string) {
           label="Account Type"
         />
 
+        <BaseSelect
+          v-model="newAccount.memberId"
+          :options="memberOptions"
+          label="Owner"
+        />
+
         <BaseInput
           v-model="newAccount.institution"
           label="Institution"
@@ -212,6 +302,84 @@ async function deleteAccount(id: string) {
           </BaseButton>
           <BaseButton :loading="isSubmitting" @click="createAccount">
             Add Account
+          </BaseButton>
+        </div>
+      </template>
+    </BaseModal>
+
+    <!-- Edit Account Modal -->
+    <BaseModal
+      :open="showEditModal"
+      title="Edit Account"
+      @close="closeEditModal"
+    >
+      <form class="space-y-4" @submit.prevent="saveEdit">
+        <BaseInput
+          v-model="editingAccount.name"
+          label="Account Name"
+          placeholder="e.g., Main Checking"
+          required
+        />
+
+        <BaseSelect
+          v-model="editingAccount.type"
+          :options="accountTypes"
+          label="Account Type"
+        />
+
+        <BaseSelect
+          v-model="editingAccount.memberId"
+          :options="memberOptions"
+          label="Owner"
+        />
+
+        <BaseInput
+          v-model="editingAccount.institution"
+          label="Institution"
+          placeholder="e.g., Bank of America"
+        />
+
+        <BaseSelect
+          v-model="editingAccount.currency"
+          :options="currencyOptions"
+          label="Currency"
+        />
+
+        <BaseInput
+          v-model="editingAccount.balance"
+          type="number"
+          label="Current Balance"
+          placeholder="0.00"
+          step="0.01"
+        />
+
+        <div class="flex items-center gap-3">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+              v-model="editingAccount.isActive"
+              type="checkbox"
+              class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+            />
+            <span class="text-sm text-gray-700 dark:text-gray-300">Active</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+              v-model="editingAccount.includeInNetWorth"
+              type="checkbox"
+              class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+            />
+            <span class="text-sm text-gray-700 dark:text-gray-300">Include in Net Worth</span>
+          </label>
+        </div>
+      </form>
+
+      <template #footer>
+        <div class="flex justify-end gap-3">
+          <BaseButton variant="secondary" @click="closeEditModal">
+            Cancel
+          </BaseButton>
+          <BaseButton data-testid="save-edit-btn" :loading="isSubmitting" @click="saveEdit">
+            Save Changes
           </BaseButton>
         </div>
       </template>
