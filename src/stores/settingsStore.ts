@@ -86,6 +86,18 @@ export const useSettingsStore = defineStore('settings', () => {
     }
   }
 
+  async function setAutoSyncEnabled(enabled: boolean): Promise<void> {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      settings.value = await settingsRepo.setAutoSyncEnabled(enabled);
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Failed to update auto-sync setting';
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function setAIProvider(provider: AIProvider): Promise<void> {
     isLoading.value = true;
     error.value = null;
@@ -161,6 +173,7 @@ export const useSettingsStore = defineStore('settings', () => {
     setBaseCurrency,
     setTheme,
     setSyncEnabled,
+    setAutoSyncEnabled,
     setAIProvider,
     setAIApiKey,
     addExchangeRate,

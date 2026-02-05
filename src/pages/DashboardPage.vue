@@ -5,6 +5,7 @@ import { useTransactionsStore } from '@/stores/transactionsStore';
 import { useGoalsStore } from '@/stores/goalsStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { BaseCard } from '@/components/ui';
+import RecurringSummaryWidget from '@/components/dashboard/RecurringSummaryWidget.vue';
 import { formatCurrency } from '@/constants/currencies';
 
 const accountsStore = useAccountsStore();
@@ -119,7 +120,7 @@ function formatMoney(amount: number): string {
       </BaseCard>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Recent Transactions -->
       <BaseCard title="Recent Transactions">
         <div v-if="recentTransactions.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -206,6 +207,9 @@ function formatMoney(amount: number): string {
           </div>
         </div>
       </BaseCard>
+
+      <!-- Recurring Summary -->
+      <RecurringSummaryWidget />
     </div>
   </div>
 </template>

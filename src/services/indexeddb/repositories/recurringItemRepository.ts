@@ -1,0 +1,97 @@
+import { getDatabase } from '../database';
+import type {
+  RecurringItem,
+  CreateRecurringItemInput,
+  UpdateRecurringItemInput,
+  ISODateString,
+} from '@/types/models';
+import { generateUUID } from '@/utils/id';
+import { toISODateString } from '@/utils/date';
+
+export async function getAllRecurringItems(): Promise<RecurringItem[]> {
+  const db = await getDatabase();
+  return db.getAll('recurringItems');
+}
+
+export async function getRecurringItemById(id: string): Promise<RecurringItem | undefined> {
+  const db = await getDatabase();
+  return db.get('recurringItems', id);
+}
+
+export async function getRecurringItemsByAccountId(accountId: string): Promise<RecurringItem[]> {
+  const db = await getDatabase();
+  return db.getAllFromIndex('recurringItems', 'by-accountId', accountId);
+}
+
+export async function getRecurringItemsByType(type: 'income' | 'expense'): Promise<RecurringItem[]> {
+  const db = await getDatabase();
+  return db.getAllFromIndex('recurringItems', 'by-type', type);
+}
+
+export async function getActiveRecurringItems(): Promise<RecurringItem[]> {
+  const items = await getAllRecurringItems();
+  return items.filter((item) => item.isActive);
+}
+
+export async function createRecurringItem(input: CreateRecurringItemInput): Promise<RecurringItem> {
+  const db = await getDatabase();
+  const now = toISODateString(new Date());
+
+  const item: RecurringItem = {
+    ...input,
+    id: generateUUID(),
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  await db.add('recurringItems', item);
+  return item;
+}
+
+export async function updateRecurringItem(
+  id: string,
+  input: UpdateRecurringItemInput
+): Promise<RecurringItem | undefined> {
+  const db = await getDatabase();
+  const existing = await db.get('recurringItems', id);
+
+  if (!existing) {
+    return undefined;
+  }
+
+  const updated: RecurringItem = {
+    ...existing,
+    ...input,
+    updatedAt: toISODateString(new Date()),
+  };
+
+  await db.put('recurringItems', updated);
+  return updated;
+}
+
+export async function deleteRecurringItem(id: string): Promise<boolean> {
+  const db = await getDatabase();
+  const existing = await db.get('recurringItems', id);
+
+  if (!existing) {
+    return false;
+  }
+
+  await db.delete('recurringItems', id);
+  return true;
+}
+
+export async function updateLastProcessedDate(
+  id: string,
+  date: ISODateString
+): Promise<RecurringItem | undefined> {
+  return updateRecurringItem(id, { lastProcessedDate: date });
+}
+
+export async function toggleRecurringItemActive(id: string): Promise<RecurringItem | undefined> {
+  const existing = await getRecurringItemById(id);
+  if (!existing) {
+    return undefined;
+  }
+  return updateRecurringItem(id, { isActive: !existing.isActive });
+}

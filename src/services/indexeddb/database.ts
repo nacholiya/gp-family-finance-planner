@@ -7,10 +7,11 @@ import type {
   Goal,
   Settings,
   SyncQueueItem,
+  RecurringItem,
 } from '@/types/models';
 
 const DB_NAME = 'gp-family-finance';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export interface FinanceDB extends DBSchema {
   familyMembers: {
@@ -37,6 +38,11 @@ export interface FinanceDB extends DBSchema {
     key: string;
     value: Goal;
     indexes: { 'by-memberId': string };
+  };
+  recurringItems: {
+    key: string;
+    value: RecurringItem;
+    indexes: { 'by-accountId': string; 'by-type': string; 'by-isActive': number };
   };
   settings: {
     key: string;
@@ -92,6 +98,14 @@ export async function getDatabase(): Promise<IDBPDatabase<FinanceDB>> {
         goalsStore.createIndex('by-memberId', 'memberId', { unique: false });
       }
 
+      // RecurringItems store
+      if (!db.objectStoreNames.contains('recurringItems')) {
+        const recurringStore = db.createObjectStore('recurringItems', { keyPath: 'id' });
+        recurringStore.createIndex('by-accountId', 'accountId', { unique: false });
+        recurringStore.createIndex('by-type', 'type', { unique: false });
+        recurringStore.createIndex('by-isActive', 'isActive', { unique: false });
+      }
+
       // Settings store
       if (!db.objectStoreNames.contains('settings')) {
         db.createObjectStore('settings', { keyPath: 'id' });
@@ -119,7 +133,7 @@ export async function closeDatabase(): Promise<void> {
 export async function clearAllData(): Promise<void> {
   const db = await getDatabase();
   const tx = db.transaction(
-    ['familyMembers', 'accounts', 'transactions', 'assets', 'goals', 'settings', 'syncQueue'],
+    ['familyMembers', 'accounts', 'transactions', 'assets', 'goals', 'recurringItems', 'settings', 'syncQueue'],
     'readwrite'
   );
 
@@ -129,28 +143,33 @@ export async function clearAllData(): Promise<void> {
     tx.objectStore('transactions').clear(),
     tx.objectStore('assets').clear(),
     tx.objectStore('goals').clear(),
+    tx.objectStore('recurringItems').clear(),
     tx.objectStore('settings').clear(),
     tx.objectStore('syncQueue').clear(),
     tx.done,
   ]);
 }
 
-export async function exportAllData(): Promise<{
+export interface ExportedData {
   familyMembers: FamilyMember[];
   accounts: Account[];
   transactions: Transaction[];
   assets: Asset[];
   goals: Goal[];
+  recurringItems: RecurringItem[];
   settings: Settings | null;
-}> {
+}
+
+export async function exportAllData(): Promise<ExportedData> {
   const db = await getDatabase();
 
-  const [familyMembers, accounts, transactions, assets, goals, settings] = await Promise.all([
+  const [familyMembers, accounts, transactions, assets, goals, recurringItems, settings] = await Promise.all([
     db.getAll('familyMembers'),
     db.getAll('accounts'),
     db.getAll('transactions'),
     db.getAll('assets'),
     db.getAll('goals'),
+    db.getAll('recurringItems'),
     db.get('settings', 'app_settings'),
   ]);
 
@@ -160,6 +179,76 @@ export async function exportAllData(): Promise<{
     transactions,
     assets,
     goals,
+    recurringItems,
     settings: settings ?? null,
   };
+}
+
+export async function importAllData(data: ExportedData): Promise<void> {
+  const db = await getDatabase();
+
+  // Clear existing data first (file always wins)
+  const clearTx = db.transaction(
+    ['familyMembers', 'accounts', 'transactions', 'assets', 'goals', 'recurringItems', 'settings'],
+    'readwrite'
+  );
+
+  await Promise.all([
+    clearTx.objectStore('familyMembers').clear(),
+    clearTx.objectStore('accounts').clear(),
+    clearTx.objectStore('transactions').clear(),
+    clearTx.objectStore('assets').clear(),
+    clearTx.objectStore('goals').clear(),
+    clearTx.objectStore('recurringItems').clear(),
+    clearTx.objectStore('settings').clear(),
+    clearTx.done,
+  ]);
+
+  // Import all data
+  const importTx = db.transaction(
+    ['familyMembers', 'accounts', 'transactions', 'assets', 'goals', 'recurringItems', 'settings'],
+    'readwrite'
+  );
+
+  const promises: Promise<unknown>[] = [];
+
+  // Import family members
+  for (const member of data.familyMembers) {
+    promises.push(importTx.objectStore('familyMembers').add(member));
+  }
+
+  // Import accounts
+  for (const account of data.accounts) {
+    promises.push(importTx.objectStore('accounts').add(account));
+  }
+
+  // Import transactions
+  for (const transaction of data.transactions) {
+    promises.push(importTx.objectStore('transactions').add(transaction));
+  }
+
+  // Import assets
+  for (const asset of data.assets) {
+    promises.push(importTx.objectStore('assets').add(asset));
+  }
+
+  // Import goals
+  for (const goal of data.goals) {
+    promises.push(importTx.objectStore('goals').add(goal));
+  }
+
+  // Import recurring items (if present - handle legacy files without this field)
+  if (data.recurringItems) {
+    for (const recurringItem of data.recurringItems) {
+      promises.push(importTx.objectStore('recurringItems').add(recurringItem));
+    }
+  }
+
+  // Import settings (if present)
+  if (data.settings) {
+    promises.push(importTx.objectStore('settings').add(data.settings));
+  }
+
+  promises.push(importTx.done);
+  await Promise.all(promises);
 }

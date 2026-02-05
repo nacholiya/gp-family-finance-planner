@@ -7,6 +7,9 @@ import { useTransactionsStore } from '@/stores/transactionsStore';
 import { useAssetsStore } from '@/stores/assetsStore';
 import { useGoalsStore } from '@/stores/goalsStore';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { useSyncStore } from '@/stores/syncStore';
+import { useRecurringStore } from '@/stores/recurringStore';
+import { processRecurringItems } from '@/services/recurring/recurringProcessor';
 import AppSidebar from '@/components/common/AppSidebar.vue';
 import AppHeader from '@/components/common/AppHeader.vue';
 
@@ -18,6 +21,8 @@ const transactionsStore = useTransactionsStore();
 const assetsStore = useAssetsStore();
 const goalsStore = useGoalsStore();
 const settingsStore = useSettingsStore();
+const syncStore = useSyncStore();
+const recurringStore = useRecurringStore();
 
 const showLayout = computed(() => {
   // Don't show sidebar/header on setup page
@@ -25,11 +30,36 @@ const showLayout = computed(() => {
 });
 
 onMounted(async () => {
-  // Load all data on app mount
-  await Promise.all([
-    familyStore.loadMembers(),
-    settingsStore.loadSettings(),
-  ]);
+  // Load settings first
+  await settingsStore.loadSettings();
+
+  // Initialize sync service (restores file handle if configured)
+  await syncStore.initialize();
+
+  // If sync is configured and we have permission, load from file (file always wins)
+  if (syncStore.isConfigured && !syncStore.needsPermission) {
+    const hasData = await syncStore.loadFromFile();
+    if (hasData) {
+      // Data was loaded from file, stores are already refreshed
+      // Check if setup is needed
+      if (!familyStore.isSetupComplete && route.name !== 'Setup') {
+        router.replace('/setup');
+        return;
+      }
+      // Process recurring items to generate due transactions
+      const result = await processRecurringItems();
+      if (result.processed > 0) {
+        // Reload transactions to include newly generated ones
+        await transactionsStore.loadTransactions();
+      }
+      // Setup auto-sync for future changes
+      syncStore.setupAutoSync();
+      return;
+    }
+  }
+
+  // No sync data or sync not configured - load from local IndexedDB
+  await familyStore.loadMembers();
 
   // Check if setup is needed
   if (!familyStore.isSetupComplete && route.name !== 'Setup') {
@@ -44,7 +74,20 @@ onMounted(async () => {
       transactionsStore.loadTransactions(),
       assetsStore.loadAssets(),
       goalsStore.loadGoals(),
+      recurringStore.loadRecurringItems(),
     ]);
+
+    // Process recurring items to generate due transactions
+    const result = await processRecurringItems();
+    if (result.processed > 0) {
+      // Reload transactions to include newly generated ones
+      await transactionsStore.loadTransactions();
+    }
+
+    // Setup auto-sync for future changes
+    if (syncStore.isConfigured) {
+      syncStore.setupAutoSync();
+    }
   }
 });
 </script>

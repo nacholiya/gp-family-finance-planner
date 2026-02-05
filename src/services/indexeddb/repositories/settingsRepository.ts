@@ -13,6 +13,8 @@ export function getDefaultSettings(): Settings {
     exchangeRates: [],
     theme: 'system',
     syncEnabled: false,
+    autoSyncEnabled: true,
+    encryptionEnabled: false,
     aiProvider: 'none',
     aiApiKeys: {},
     createdAt: now,
@@ -51,6 +53,10 @@ export async function setTheme(theme: 'light' | 'dark' | 'system'): Promise<Sett
 
 export async function setSyncEnabled(enabled: boolean): Promise<Settings> {
   return saveSettings({ syncEnabled: enabled });
+}
+
+export async function setAutoSyncEnabled(enabled: boolean): Promise<Settings> {
+  return saveSettings({ autoSyncEnabled: enabled });
 }
 
 export async function setAIProvider(provider: AIProvider): Promise<Settings> {

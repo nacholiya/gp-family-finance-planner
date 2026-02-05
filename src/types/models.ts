@@ -62,7 +62,30 @@ export interface Transaction {
   date: ISODateString;
   description: string;
   recurring?: RecurringConfig;
+  recurringItemId?: UUID; // Links to source RecurringItem if auto-generated
   isReconciled: boolean;
+  createdAt: ISODateString;
+  updatedAt: ISODateString;
+}
+
+// RecurringItem - Template for generating recurring transactions
+export type RecurringFrequency = 'daily' | 'monthly' | 'yearly';
+
+export interface RecurringItem {
+  id: UUID;
+  accountId: UUID; // Links to Account (and thus FamilyMember)
+  type: 'income' | 'expense';
+  amount: number;
+  currency: CurrencyCode;
+  category: string;
+  description: string;
+  frequency: RecurringFrequency;
+  dayOfMonth: number; // 1-28 for monthly/yearly
+  monthOfYear?: number; // 1-12, only for yearly frequency
+  startDate: ISODateString;
+  endDate?: ISODateString;
+  lastProcessedDate?: ISODateString;
+  isActive: boolean;
   createdAt: ISODateString;
   updatedAt: ISODateString;
 }
@@ -135,6 +158,10 @@ export interface Settings {
   exchangeRates: ExchangeRate[];
   theme: 'light' | 'dark' | 'system';
   syncEnabled: boolean;
+  syncFilePath?: string; // Display name of sync file
+  autoSyncEnabled: boolean;
+  encryptionEnabled: boolean;
+  lastSyncTimestamp?: ISODateString;
   aiProvider: AIProvider;
   aiApiKeys: AIApiKeys;
   createdAt: ISODateString;
@@ -143,7 +170,7 @@ export interface Settings {
 
 // Sync queue item for tracking changes
 export type SyncOperation = 'create' | 'update' | 'delete';
-export type EntityType = 'familyMember' | 'account' | 'transaction' | 'asset' | 'goal' | 'settings';
+export type EntityType = 'familyMember' | 'account' | 'transaction' | 'asset' | 'goal' | 'recurringItem' | 'settings';
 
 export interface SyncQueueItem {
   id: UUID;
@@ -188,3 +215,32 @@ export type UpdateAssetInput = Partial<Omit<Asset, 'id' | 'createdAt' | 'updated
 
 export type CreateGoalInput = Omit<Goal, 'id' | 'createdAt' | 'updatedAt'>;
 export type UpdateGoalInput = Partial<Omit<Goal, 'id' | 'createdAt' | 'updatedAt'>>;
+
+export type CreateRecurringItemInput = Omit<RecurringItem, 'id' | 'createdAt' | 'updatedAt'>;
+export type UpdateRecurringItemInput = Partial<Omit<RecurringItem, 'id' | 'createdAt' | 'updatedAt'>>;
+
+// Sync file format
+export const SYNC_FILE_VERSION = '1.0';
+
+export interface SyncFileData {
+  version: string;
+  exportedAt: ISODateString;
+  encrypted: boolean;
+  data: {
+    familyMembers: FamilyMember[];
+    accounts: Account[];
+    transactions: Transaction[];
+    assets: Asset[];
+    goals: Goal[];
+    recurringItems: RecurringItem[];
+    settings: Settings | null;
+  };
+}
+
+export interface SyncStatus {
+  isConfigured: boolean;
+  fileName: string | null;
+  lastSync: ISODateString | null;
+  isSyncing: boolean;
+  error: string | null;
+}
