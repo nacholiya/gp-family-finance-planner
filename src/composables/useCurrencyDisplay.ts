@@ -1,16 +1,27 @@
 import { computed } from 'vue';
 import { useSettingsStore } from '@/stores/settingsStore';
-import { formatCurrency, getCurrencyInfo } from '@/constants/currencies';
+import { getCurrencyInfo } from '@/constants/currencies';
 import type { CurrencyCode, ExchangeRate } from '@/types/models';
 
 /**
- * Format currency with code prefix (e.g., "USD $100.00")
+ * Format currency with code prefix (e.g., "USD $100.00", "SGD $100.00")
+ * Uses $ for dollar-based currencies, otherwise the currency's symbol
  */
 function formatCurrencyWithCode(amount: number, currencyCode: CurrencyCode): string {
   const info = getCurrencyInfo(currencyCode);
-  const formatted = formatCurrency(amount, currencyCode);
-  // Add currency code prefix for clarity
-  return `${currencyCode} ${info?.symbol || ''}${formatted.replace(info?.symbol || '', '').trim()}`;
+  const decimals = info?.decimals ?? 2;
+
+  // Format the number with proper decimal places and thousand separators
+  const formattedNumber = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(amount);
+
+  // Use $ for dollar-based currencies (USD, SGD, etc.), otherwise use the symbol
+  const isDollarBased = currencyCode.endsWith('D') || currencyCode === 'USD';
+  const symbol = isDollarBased ? '$' : (info?.symbol || '');
+
+  return `${currencyCode} ${symbol}${formattedNumber}`;
 }
 
 export interface ConvertedAmount {
