@@ -1,7 +1,7 @@
 # Project Status
 
-> **Last updated:** 2026-02-17
-> **Updated by:** Claude (Stages 1–3 multi-family architecture + auth)
+> **Last updated:** 2026-02-18
+> **Updated by:** Claude (File-first architecture)
 
 ## Current Phase
 
@@ -97,6 +97,20 @@
 - SettingsPage Security section with PasskeySettings (shown when auth is configured)
 - Requires Cognito WebAuthn support + server-side challenge generation for full flow
 
+### File-First Architecture
+
+- Encrypted data file is the source of truth; IndexedDB is a temporary cache deleted on sign-out
+- Sign-out cleanup: `deleteFamilyDatabase()`, `resetState()` on all data stores, file handle preserved
+- App startup always loads from data file when configured; IndexedDB fallback only when file permission not yet granted
+- Auto-sync always on when file is configured (no toggle)
+- Setup wizard adds Step 3 "Secure Your Data": requires file creation with encryption password
+- Default `encryptionEnabled` changed to `true`
+- Settings renamed "File Sync" → "Family Data Options"; removed Sync Now, Disconnect, Auto-sync toggle
+- Encryption toggle warns before disabling
+- SyncStatusIndicator: "Syncing..." → "Saving...", "Synced to..." → "Data saved to..."
+- Login page: three security benefit bullet points (encrypted file, no server storage, cloud backup via folder)
+- ADR-011: file-first architecture decision record
+
 ### Recent Fixes
 
 - **Multi-family isolation hardening** — Fixed cross-family data leakage when authenticated user's familyId could not be resolved:
@@ -145,18 +159,21 @@ _(None currently tracked)_
 
 ## Decision Log
 
-| Date       | Decision                                                | Rationale                                                               |
-| ---------- | ------------------------------------------------------- | ----------------------------------------------------------------------- |
-| 2026-02-17 | Created docs/STATUS.md for project tracking             | Multiple contributors need shared context                               |
-| 2026-02-17 | Added ARCHITECTURE.md and 8 ADR documents               | Document key decisions for contributor onboarding                       |
-| Prior      | Switched from idb library to native IndexedDB APIs      | Reduce dependencies                                                     |
-| Prior      | Chose File System Access API over Google Drive for sync | Simpler implementation, no OAuth needed, user controls file location    |
-| Prior      | Used AES-GCM + PBKDF2 for encryption                    | Industry standard, no external dependencies (Web Crypto API)            |
-| Prior      | Stored amounts in original currency, convert on display | No data loss from premature conversion, flexible display                |
-| Prior      | Recurring items as templates, not transactions          | Clean separation, catch-up processing, easy to preview                  |
-| Prior      | MyMemory API for translations                           | Free, CORS-enabled, no API key required                                 |
-| 2026-02-17 | Per-family databases instead of familyId on all models  | No repository code changes, no schema migration, clean tenant isolation |
-| 2026-02-17 | Global settings (theme, language, rates) in registry DB | Device-level preferences survive family switching                       |
-| 2026-02-17 | AWS Cognito for auth (optional, not required)           | Standard auth provider, extensible for magic link + passkey             |
-| 2026-02-17 | Auth is optional — "Continue without account" mode      | Preserves existing local-only behavior for users without AWS setup      |
-| 2026-02-17 | 7-day offline grace period for cached auth tokens       | Balance between security and offline usability                          |
+| Date       | Decision                                                   | Rationale                                                               |
+| ---------- | ---------------------------------------------------------- | ----------------------------------------------------------------------- |
+| 2026-02-17 | Created docs/STATUS.md for project tracking                | Multiple contributors need shared context                               |
+| 2026-02-17 | Added ARCHITECTURE.md and 8 ADR documents                  | Document key decisions for contributor onboarding                       |
+| Prior      | Switched from idb library to native IndexedDB APIs         | Reduce dependencies                                                     |
+| Prior      | Chose File System Access API over Google Drive for sync    | Simpler implementation, no OAuth needed, user controls file location    |
+| Prior      | Used AES-GCM + PBKDF2 for encryption                       | Industry standard, no external dependencies (Web Crypto API)            |
+| Prior      | Stored amounts in original currency, convert on display    | No data loss from premature conversion, flexible display                |
+| Prior      | Recurring items as templates, not transactions             | Clean separation, catch-up processing, easy to preview                  |
+| Prior      | MyMemory API for translations                              | Free, CORS-enabled, no API key required                                 |
+| 2026-02-17 | Per-family databases instead of familyId on all models     | No repository code changes, no schema migration, clean tenant isolation |
+| 2026-02-17 | Global settings (theme, language, rates) in registry DB    | Device-level preferences survive family switching                       |
+| 2026-02-17 | AWS Cognito for auth (optional, not required)              | Standard auth provider, extensible for magic link + passkey             |
+| 2026-02-17 | Auth is optional — "Continue without account" mode         | Preserves existing local-only behavior for users without AWS setup      |
+| 2026-02-17 | 7-day offline grace period for cached auth tokens          | Balance between security and offline usability                          |
+| 2026-02-18 | File-first architecture: encrypted file as source of truth | Security value proposition, user data control, IndexedDB is ephemeral   |
+| 2026-02-18 | Encryption enabled by default for new data files           | Secure by default, users can opt out with explicit warning              |
+| 2026-02-18 | Auto-sync always on (no toggle)                            | Simplifies UX, data file always stays current                           |
