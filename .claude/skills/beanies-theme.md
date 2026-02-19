@@ -7,7 +7,7 @@ Use this skill whenever writing UI copy, designing components, choosing colors, 
 ## Identity
 
 - **App name:** `beanies.family` (always lowercase, always with the `.family` TLD — never "Beanies", "beanies", or "Beanies Family")
-- **Tagline:** *Every bean counts* (sentence case, no period)
+- **Tagline:** *every bean counts* (lower case, no period)
 - **Origin story:** Born from a father's nickname for his son. The app is the focal point where piano lessons meet financial planning — a family legacy tool, not a spreadsheet.
 - **Core promise:** "We don't just count beans; we grow them."
 
@@ -15,24 +15,35 @@ Use this skill whenever writing UI copy, designing components, choosing colors, 
 
 ## Colors — The Sunrise Security Set
 
-| Name | Hex | Role | Use for |
-|------|-----|------|---------|
-| Deep Slate | `#2C3E50` | The Foundation | Primary text, security, dark backgrounds |
-| Heritage Orange | `#F15D22` | The Energy | Primary actions, CTA buttons, growth indicators |
-| Sky Silk | `#AED6F1` | The Calm | Parent elements, backgrounds, light shadows |
-| Terracotta | `#E67E22` | The Human | Children, personal milestones, warnings |
+| Name | Hex | CSS Variable | Role | Use for |
+|------|-----|-------------|------|---------|
+| Deep Slate | `#2C3E50` | `--color-secondary`, `--color-text` | The Foundation | Primary text, security, dark backgrounds |
+| Heritage Orange | `#F15D22` | `--color-primary` | The Energy | Primary actions, CTA buttons, growth indicators |
+| Heritage Orange Dark | `#D14D1A` | `--color-primary-dark` | — | Hover/active states for primary |
+| Sky Silk | `#AED6F1` | — | The Calm | Parent elements, backgrounds, light shadows, focus rings |
+| Terracotta | `#E67E22` | `--color-warning` | The Human | Children, personal milestones, warnings |
+| Success Green | `#22c55e` | `--color-success` | — | Income indicators (keep green) |
+| Error Red | `#ef4444` | `--color-danger` | — | Form validation errors and destructive action buttons ONLY |
+| Warm White | `#FDFBF9` | `--color-background` | — | Light mode page background |
+| Warm Surface | `#F5F1ED` | `--color-surface` | — | Light mode card/surface background |
 
 ### Dark mode
-- Background: Deep Slate `#2C3E50` and darker variants (`#1a252f`)
-- Surfaces: `#34495E`
-- Accent: Heritage Orange (slightly muted on dark surfaces)
+
+- Background: Deep Slate `#2C3E50` and darker variants (`#1a252f`, `#243342`)
+- Surfaces: `#34495E` (lighter slate)
+- Accent: Heritage Orange `#F15D22` (slightly muted: `#E0551F` on dark surfaces)
 - Text: `#ECF0F1` (light), `#BDC3C7` (muted)
+- Borders: `#4A6274`
+- Keep existing Tailwind `dark:` prefix pattern, swap in brand colors
 
 ### Rules
-- **Never use "Alert Red"** for notifications or important messages — use Heritage Orange to keep the mood positive and secure
-- Keep `green-*` for income indicators
-- Keep `red-*` only for destructive actions and hard form validation errors
-- Heritage Orange replaces all primary `blue-*` usage throughout the UI
+
+- **Heritage Orange** is the primary action color. Use for buttons, active states, CTAs, links, toggles, progress bars.
+- **Never use "Alert Red"** for notifications or important messages — use Heritage Orange to keep the mood positive and secure.
+- Keep `green-*` for income indicators.
+- Keep `red-*` only for destructive actions and hard form validation errors.
+- Heritage Orange replaces all primary `blue-*` usage throughout the UI.
+- **Sky Silk for soft accents.** Use for focus rings, background highlights, card shadows, hover states on light backgrounds.
 
 ---
 
@@ -41,6 +52,7 @@ Use this skill whenever writing UI copy, designing components, choosing colors, 
 | Font | Weight | Use for |
 |------|--------|---------|
 | Outfit | 700 | Headings (h1, h2, h3) |
+| Outfit | 600 | Subheadings, emphasized values |
 | Outfit | 500 | App name wordmark, subheadings |
 | Outfit | 400 | Financial values and large numbers |
 | Inter | 600 | Labels, column headers, strong body |
@@ -48,7 +60,17 @@ Use this skill whenever writing UI copy, designing components, choosing colors, 
 
 - Financial figures always use Outfit — they must be clear and easy to read
 - Numbers should emphasise the "Every bean counts" value proposition
-- Google Fonts import: `Outfit:wght@400;500;700` and `Inter:wght@400;600`
+
+### Font loading
+
+```html
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+```
+
+```css
+body { font-family: 'Inter', system-ui, sans-serif; }
+h1, h2, h3, .font-headline, .font-brand, .font-amount { font-family: 'Outfit', system-ui, sans-serif; }
+```
 
 ---
 
@@ -62,12 +84,28 @@ Use this skill whenever writing UI copy, designing components, choosing colors, 
 - **On Deep Slate backgrounds:** Knockout white (all elements white)
 - **On Heritage Orange backgrounds:** Knockout white
 
-### Transparent brand asset files (in `public/brand/`)
-- Logo: `beanies-logo-transparent.png`
-- Spinner: `beanies-spinner-no-text-transparent.png`
-- Watermark: `beanies-watermark-transparent.png`
-- Celebration (line): `beanies-celebrating-line.png`
-- Celebration (circle): `beanies-celebrating-circle.png`
+---
+
+## Visual Assets
+
+All assets in `public/brand/`.
+
+| Asset | File | Usage |
+|-------|------|-------|
+| Logo (opaque) | `beanies-logo.png` | Standalone on white/light backgrounds |
+| Logo (transparent) | `beanies-logo-transparent.png` | Overlays, dark mode, colored backgrounds, sidebar |
+| Spinner with text | `beanies-spinner.png` | Full loading screen |
+| Spinner no text (opaque) | `beanies-spinner-no-text.png` | Inline loading on light backgrounds |
+| Spinner no text (transparent) | `beanies-spinner-no-text-transparent.png` | Inline loading on dark/colored backgrounds |
+| Watermark (opaque) | `beanies-watermark.png` | Footer watermark on light backgrounds |
+| Watermark (transparent) | `beanies-watermark-transparent.png` | Footer watermark on dark/colored backgrounds |
+| Celebration circle | `beanies-celebrating-circle.png` | Toast celebrations (auto-dismiss) |
+| Celebration line | `beanies-celebrating-line.png` | Modal celebrations (with dismiss button) |
+
+### Transparent vs Opaque selection
+
+- **Transparent:** Use wherever the image overlays content, colored backgrounds, or dark mode surfaces (sidebar logo, header branding, celebration overlays, watermarks, dark mode)
+- **Opaque:** Use for standalone display on white/light backgrounds (login hero, setup wizard, favicon source)
 
 ---
 
@@ -85,30 +123,74 @@ Use this skill whenever writing UI copy, designing components, choosing colors, 
 
 - **Shape language:** Squircles — use high corner radius (`rounded-2xl`, `rounded-3xl`) on all buttons and cards. Never use sharp corners.
 - **Shadows:** Soft Sky Silk `#AED6F1` tinted shadows to make the UI feel lightweight
-- **Border radius reference:**
-  - Buttons: `rounded-2xl`
-  - Cards: `rounded-2xl` or `rounded-3xl`
-  - Inputs: `rounded-xl`
-  - Modals: `rounded-3xl`
 - **Celebrations:** Punctuate happy moments with celebratory images or animations from `public/brand/`
 
-### Celebration triggers
+### Border radius reference
+
+| Component | Radius |
+|-----------|--------|
+| Buttons | `rounded-2xl` (1rem) |
+| Cards | `rounded-2xl` or `rounded-3xl` (1.5rem) |
+| Inputs, Selects | `rounded-xl` (0.75rem) |
+| Modals | `rounded-3xl` (1.5rem) |
+| Badges/chips | `rounded-full` |
+
+### Shadows
+
+```css
+box-shadow: 0 4px 14px rgba(174, 214, 241, 0.3);    /* Light mode */
+box-shadow: 0 4px 14px rgba(44, 62, 80, 0.4);        /* Dark mode */
+```
+
+### Focus rings
+
+```css
+/* Primary inputs/buttons */
+ring-2 ring-[#AED6F1] ring-offset-2  /* Sky Silk ring */
+
+/* Destructive buttons only */
+ring-2 ring-red-300 ring-offset-2
+```
+
+### Component styling quick reference
+
+```
+BaseButton (primary):  bg-[#F15D22] hover:bg-[#D14D1A] text-white rounded-2xl
+BaseButton (secondary): bg-[#2C3E50] hover:bg-[#1a252f] text-white rounded-2xl
+BaseCard:              bg-white dark:bg-[#34495E] rounded-2xl shadow-sky-silk
+BaseInput:             rounded-xl focus:ring-[#AED6F1]
+BaseSelect:            rounded-xl focus:ring-[#AED6F1]
+BaseModal:             rounded-3xl
+Active nav item:       bg-orange-50 text-[#F15D22] border-l-[#F15D22]
+Progress bars:         bg-[#F15D22]
+```
+
+---
+
+## Celebration Triggers
+
 | Trigger | Asset | Mode | Message |
 |---------|-------|------|---------|
-| Complete setup wizard | `beanies-celebrating-line.png` | Modal | Welcome message - "Setup complete - ready to start counting your beanies!" |
+| Complete setup wizard | `beanies-celebrating-line.png` | Modal | "Setup complete — ready to start counting your beanies!" |
 | First bank account | `beanies-celebrating-circle.png` | Toast | "Your first bean is planted!" |
 | First transaction | `beanies-celebrating-circle.png` | Toast | "Every beanie counts!" |
 | Goal reached 100% | `beanies-celebrating-line.png` | Modal | "Goal complete! The beanies are proud!" |
 | First file save | `beanies-celebrating-circle.png` | Toast | "Your beanies are safe and encrypted!" |
 | Debt goal paid off | `beanies-celebrating-line.png` | Modal | "Debt-free! The beanies are celebrating!" |
 
-Toast: bottom-center, auto-dismiss 4s, bounce-in animation. Modal: centered overlay with dismiss button.
+### Implementation pattern
+
+- **Toast:** Bottom-center, auto-dismiss 4s, subtle bounce-in animation
+- **Modal:** Centered overlay with image, congratulatory message, dismiss button
+- Track "first time" events in localStorage to avoid repeating first-time celebrations
+- Use a reusable `CelebrationOverlay.vue` component
 
 ---
 
 ## Brand Voice & Writing Style
 
 ### The five principles
+
 1. **Simple** — Plain language over jargon. Say "Beans" not "Liquid Assets." Say "Money in" not "Net positive cash inflow."
 2. **Friendly** — Warm and informal. Speak directly to the user ("your beans", "your family"). Avoid cold, clinical phrasing.
 3. **Comforting** — Use warm greetings, celebrate milestones, acknowledge effort.
@@ -116,6 +198,7 @@ Toast: bottom-center, auto-dismiss 4s, bounce-in animation. Modal: centered over
 5. **Familiar** — Use names. Treat every activity as an investment in the family.
 
 ### Preferred phrasing
+
 | Instead of | Say |
 |-----------|-----|
 | Loading... | counting beans... |
@@ -128,6 +211,7 @@ Toast: bottom-center, auto-dismiss 4s, bounce-in animation. Modal: centered over
 | Error saving | Hmm, we couldn't save your beans |
 
 ### Writing UI copy — checklist
+
 - Does it feel warm and human?
 - Does it use the user's name or family name where possible?
 - Does it avoid "Alert Red" language (doom, error, fail) in favour of constructive framing?
@@ -135,6 +219,7 @@ Toast: bottom-center, auto-dismiss 4s, bounce-in animation. Modal: centered over
 - Is it shorter than it needs to be? (Remove every word that doesn't add warmth or clarity.)
 
 ### Drawing images and illustrations
+
 When generating or describing brand images:
 - **The beanies characters** are round, simple, friendly bean shapes with hands
 - The **parent bean** is blue/Sky Silk; the **child bean** is orange/Terracotta
@@ -157,6 +242,19 @@ When generating or describing brand images:
 | Last Saved | Last Sync |
 | Saving... | Syncing... |
 | counting beans... | Loading... |
+
+---
+
+## Tailwind Color Mapping (Find & Replace Guide)
+
+| Old Pattern | New Pattern | Context |
+|-------------|-------------|---------|
+| `blue-600`, `blue-500` | Heritage Orange equiv | Primary actions |
+| `blue-50`, `blue-100` | `orange-50` or Sky Silk bg | Background highlights |
+| `from-blue-600 via-cyan-500 to-teal-500` | Brand gradient | Gradients |
+| `red-*` (in alerts/notifications) | Heritage Orange | Non-error alerts |
+| `red-*` (in form errors, delete buttons) | Keep `red-*` | Validation & destructive |
+| `green-*` (income) | Keep `green-*` | Income indicators |
 
 ---
 
