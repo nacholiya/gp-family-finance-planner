@@ -1,7 +1,7 @@
 # Project Status
 
 > **Last updated:** 2026-02-19
-> **Updated by:** Claude (beanies.family rebranding — Issue #22)
+> **Updated by:** Claude (beanie brand asset icons — covering eyes, open eyes, impact bullet)
 
 ## Current Phase
 
@@ -42,6 +42,13 @@
 - Settings page (currency, theme, sync, encryption)
 - First-run setup wizard
 - Multi-currency display with global display currency selector
+
+### Beanie Brand Asset Icons
+
+- `beanies_covering_eyes_transparent_512x512.png` — replaces all lock/closed-padlock SVG icons (privacy mode active, data encrypted, data hidden)
+- `beanies_open_eyes_transparent_512x512.png` — replaces all open-padlock SVG icons (privacy mode off, data visible, data unencrypted)
+- `beanies_impact_bullet_transparent_192x192.png` — replaces warning/alert/exclamation SVG icons and all feature bullet point icons (SyncStatusIndicator warning, PasskeySettings alert, LoginPage security bullets, SetupPage security bullets)
+- Theme skill (`.claude/skills/beanies-theme.md`) updated with icon usage guide
 
 ### Multi-Family Architecture (Stage 1)
 

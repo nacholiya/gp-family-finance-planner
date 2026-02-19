@@ -101,6 +101,21 @@ All assets in `public/brand/`.
 | Watermark (transparent) | `beanies-watermark-transparent.png` | Footer watermark on dark/colored backgrounds |
 | Celebration circle | `beanies-celebrating-circle.png` | Toast celebrations (auto-dismiss) |
 | Celebration line | `beanies-celebrating-line.png` | Modal celebrations (with dismiss button) |
+| Covering eyes | `beanies_covering_eyes_transparent_512x512.png` | Privacy/hidden state — replaces lock icons. Use wherever data is protected, hidden, or encrypted. |
+| Open eyes | `beanies_open_eyes_transparent_512x512.png` | Visible/exposed state — replaces open-lock icons. Use wherever data is visible or unencrypted. |
+| Impact bullet | `beanies_impact_bullet_transparent_192x192.png` | Bullet points, alerts, and flair. Use in place of list bullet markers, exclamation/warning icons, and anywhere a touch of beanie energy adds impact. Also suitable as a semi-transparent watermark. |
+
+### Icon usage guide
+
+| Situation | Asset to use |
+|-----------|-------------|
+| Privacy mode active (figures hidden) | `beanies_covering_eyes_transparent_512x512.png` |
+| Privacy mode off (figures visible) | `beanies_open_eyes_transparent_512x512.png` |
+| Data encrypted | `beanies_covering_eyes_transparent_512x512.png` |
+| Data not encrypted / exposed | `beanies_open_eyes_transparent_512x512.png` |
+| Feature bullet point | `beanies_impact_bullet_transparent_192x192.png` |
+| Warning / alert / attention needed | `beanies_impact_bullet_transparent_192x192.png` |
+| Watermark / background flair | `beanies_impact_bullet_transparent_192x192.png` at low opacity |
 
 ### Transparent vs Opaque selection
 
