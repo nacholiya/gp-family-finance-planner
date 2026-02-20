@@ -1,7 +1,7 @@
 # Project Status
 
 > **Last updated:** 2026-02-20
-> **Updated by:** Claude (Issue #46 — Sound effects system, closing #40)
+> **Updated by:** Claude (Issue #55 — Completed goals section)
 
 ## Current Phase
 
@@ -36,7 +36,7 @@
 - Accounts management (full CRUD, card-based layout)
 - Transactions management (full CRUD, with date filter, category icons)
 - Assets management (full CRUD, loan tracking, combined net worth)
-- Goals management (full CRUD)
+- Goals management (full CRUD, collapsible completed goals section)
 - Reports page (net worth, income vs expenses, extended date ranges, category breakdowns)
 - Family member management (global member filter)
 - Settings page (currency, theme, sync, encryption)
@@ -214,9 +214,17 @@
 
 - **Multi-Family with AWS Cognito Auth** — All 6 stages implemented (client-side); awaiting AWS infrastructure deployment for magic link + passkey backend
 
+### Completed Goals Section (Issue #55)
+
+- Collapsible "Completed Goals" disclosure section below active goals list (collapsed by default)
+- Completed goals sorted by most recently completed, showing name, type, member, completion date, and final amounts
+- Reopen button moves a goal back to the active list; delete button removes with whoosh sound
+- Muted styling distinguishes completed from active goals; privacy mode blur on amounts
+- Renamed "All Goals" card to "Active Goals" for clarity
+- 3 new translation keys with beanie mode overrides (`goals.reopenGoal`, `goals.noCompletedGoals`, `goals.completedOn`)
+
 ## Up Next (Phase 1 Remaining)
 
-- [ ] Completed goals section on Goals page (Issue #55)
 - [ ] Switchable UI themes (Issue #41)
 - [ ] Data validation and error handling improvements
 - [ ] Responsive design polish
@@ -265,3 +273,4 @@ _(None currently tracked)_
 | 2026-02-20 | Centralized icon system (Issue #44)                        | Single source of truth for ~72 icons, brand-enforced stroke style       |
 | 2026-02-20 | Web Audio API for sound effects (Issue #46)                | Zero bundle size, no audio files, sub-ms latency, browser-native        |
 | 2026-02-20 | Beanie UI overhaul complete (Issue #40)                    | All 13 sections done: icons, animations, sounds, empty states, 404, etc |
+| 2026-02-20 | Collapsible completed goals section (Issue #55)            | Disclosure pattern over tabs — completed goals are secondary archive    |
