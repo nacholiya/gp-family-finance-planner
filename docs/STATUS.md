@@ -1,7 +1,7 @@
 # Project Status
 
 > **Last updated:** 2026-02-20
-> **Updated by:** Claude (Issue #44 — BeanieIcon component + centralized icon system)
+> **Updated by:** Claude (Issue #46 — Sound effects system, closing #40)
 
 ## Current Phase
 
@@ -59,7 +59,52 @@
 - CategoryIcon.vue reduced from ~365 lines to ~45 lines (19-branch v-if chain → single BeanieIcon)
 - AccountsPage reduced from 893 to ~591 lines; AssetsPage collapsed 2x 9-branch asset type icon chains
 - Zero inline `<svg>` elements remaining in all migrated files
-- Issue #40 broken into 7 sub-issues (#44–#50) for remaining UI overhaul work
+
+### Micro-Animations (Issue #45)
+
+- Page header icon bounce on load, sidebar hover wobble/scale, card hover lift
+- Summary card count-up animation, goal progress bar fill animation
+- Empty state floating/breathing animation
+- Privacy toggle beanie blink, theme toggle rotation
+- All animations respect `prefers-reduced-motion`
+- CSS `@keyframes` using hardware-accelerated `transform` + `opacity`
+
+### Empty State Beanie Illustrations (Issue #47)
+
+- Beanie character illustrations for all empty states: accounts, transactions, recurring, assets, goals, reports, dashboard
+- `EmptyStateIllustration.vue` component with variant prop
+- Stored in `public/brand/empty-states/`
+
+### 404 Page Redesign (Issue #48)
+
+- Full beanie-themed 404 page with lost beanie illustration
+- Playful heading and encouraging subtext, brand-styled CTA
+
+### Loading States with Brand Spinner (Issue #49)
+
+- `BeanieSpinner.vue` component using `beanies_spinner_transparent_192x192.png`
+- Brand spinner for all loading states (app load, language switching, data fetch, button loading)
+- Loading text: "counting beans..." (never "Loading...")
+
+### Forecast "Coming Soon" Redesign (Issue #50)
+
+- Beanie with telescope illustration
+- Warm brand-voice copy, beanie impact bullet icons for feature list
+
+### Sound Effects System (Issue #46)
+
+- **`src/composables/useSounds.ts`** — Web Audio API synthesised sounds (zero bundle size, sub-ms latency)
+- 6 sound functions: `playPop()`, `playClink()`, `playChime()`, `playFanfare()`, `playWhoosh()`, `playBlink()`
+- `soundEnabled` global setting (defaults to `true`) with toggle in Settings > General
+- AudioContext created lazily on first user gesture (browser autoplay compliance)
+- Celebration integration: `playChime()` on toast celebrations, `playFanfare()` on modal celebrations
+- Delete actions: `playWhoosh()` on account/transaction/recurring/asset/goal deletes
+- Privacy toggle: `playBlink()` on header privacy eye toggle
+- App.vue watcher syncs `soundEnabled` setting to composable
+- Goal completion detection fixed: `updateGoal()` now detects completion transitions and fires celebrations (previously only `updateProgress()` did, which was never called from UI)
+- Goals empty state fixed: shows when all goals are completed (was checking all goals instead of active goals)
+- Celebration toast image enlarged from 40px to 80px
+- Unit tests (5) and E2E tests (3)
 
 ### Multi-Family Architecture (Stage 1)
 
@@ -168,10 +213,11 @@
 ## In Progress
 
 - **Multi-Family with AWS Cognito Auth** — All 6 stages implemented (client-side); awaiting AWS infrastructure deployment for magic link + passkey backend
-- **Beanie-Themed UI Overhaul (Issue #40)** — Icons phase complete (#44). Remaining sub-issues: micro-animations (#45), sound effects (#46), empty state illustrations (#47), 404 page (#48), loading states (#49), forecast page redesign (#50)
 
 ## Up Next (Phase 1 Remaining)
 
+- [ ] Completed goals section on Goals page (Issue #55)
+- [ ] Switchable UI themes (Issue #41)
 - [ ] Data validation and error handling improvements
 - [ ] Responsive design polish
 - [ ] Financial forecasting / projections page
@@ -217,3 +263,5 @@ _(None currently tracked)_
 | 2026-02-18 | Auto-sync always on (no toggle)                            | Simplifies UX, data file always stays current                           |
 | 2026-02-19 | Rebranded to beanies.family (Issue #22)                    | Heritage Orange + Deep Slate palette, Outfit + Inter fonts, squircles   |
 | 2026-02-20 | Centralized icon system (Issue #44)                        | Single source of truth for ~72 icons, brand-enforced stroke style       |
+| 2026-02-20 | Web Audio API for sound effects (Issue #46)                | Zero bundle size, no audio files, sub-ms latency, browser-native        |
+| 2026-02-20 | Beanie UI overhaul complete (Issue #40)                    | All 13 sections done: icons, animations, sounds, empty states, 404, etc |
