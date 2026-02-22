@@ -516,6 +516,6 @@ The setup wizard (`src/pages/SetupPage.vue`) uses a 3-step warm welcome flow:
 ## Reference
 
 - Full CIG v2: `docs/brand/beanies-cig-v2.html`
-- UI framework proposal (v4): `docs/brand/beanies-ui-framework-proposal-v4.html`
+- UI framework proposal (v5): `docs/brand/beanies-ui-framework-proposal-v5.html`
 - Brand assets: `public/brand/`
 - Issue #22: Full rebranding task tracking

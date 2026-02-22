@@ -448,20 +448,23 @@
 - [ ] Responsive design polish
 - [ ] Financial forecasting / projections page
 
-## v4 UI Framework Proposal
+## v5 UI Framework Proposal
 
-A v4 UI framework proposal has been uploaded to `docs/brand/beanies-ui-framework-proposal-v4.html`, superseding v3 with additional screens and design refinements. New issues created:
+A v5 UI framework proposal has been uploaded to `docs/brand/beanies-ui-framework-proposal-v5.html`, superseding v4 with expanded login/onboarding screens and design refinements. The v3 proposal (`beanies-ui-framework-proposals-v3.html`) has been removed as it is no longer relevant.
+
+v5 adds a split login/auth flow (Proposals 00a–00d: Welcome Gate, Sign In, Create Pod, Join Pod) and updated onboarding screens. All previous v4 screens are retained.
 
 | Issue | Screen                                                               | Status     |
 | ----- | -------------------------------------------------------------------- | ---------- |
 | #68   | Budget page — family budget tracking with category budgets           | New screen |
-| #69   | Login page UI redesign — warm welcome with trust badges              | Redesign   |
+| #69   | Login page UI redesign — Welcome Gate + Sign In per v5 proposal      | Redesign   |
 | #70   | Accounts page redesign — Assets/Liabilities hero + Cards/List toggle | Redesign   |
 | #71   | Transactions page — full ledger view                                 | Redesign   |
 | #72   | Landing page — public-facing hero page                               | New screen |
 | #73   | Family Hub — 3-column layout with calendar and events                | Redesign   |
+| #62   | Onboarding redesign — v5 welcome flow with illustrations             | Redesign   |
 
-Existing issues updated with v4 references: #60, #61, #62, #63, #64.
+Existing issues updated with v5 references: #60, #61, #62, #69.
 
 ## Future Phases
 
@@ -512,6 +515,7 @@ _(None currently tracked)_
 | 2026-02-20 | Financial institution dropdown (Issue #42)                 | Searchable combobox with custom entry persistence, deferred save                                                          |
 | 2026-02-21 | Sidebar redesign — Deep Slate + emoji nav (Issue #59)      | Permanent dark sidebar, emoji icons, nav extracted to shared constant for mobile reuse                                    |
 | 2026-02-21 | v4 UI framework proposal uploaded                          | New screens: Budget (#68), Login UI (#69), Landing (#72). Redesigns: Accounts (#70), Transactions (#71), Family Hub (#73) |
+| 2026-02-22 | v5 UI framework proposal uploaded, v3 removed              | v5 adds split login flow (Welcome Gate, Sign In, Create Pod, Join Pod) + updated onboarding. v3 deleted as obsolete       |
 | 2026-02-21 | Header redesign — seamless icon-only controls (#67)        | Page titles in header (not in views), no border/bg, squircle icon-only controls, notification bell, avatar-only profile   |
 | 2026-02-21 | Net worth chart via transaction replay (#66)               | Option A (replay backwards from current balances) chosen over snapshot approach for MVP simplicity                        |
 | 2026-02-21 | PNG brand avatars replace inline SVGs (#65)                | Hand-crafted PNGs are more expressive; member differentiation via colored ring + pastel background                        |
