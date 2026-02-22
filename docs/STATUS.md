@@ -1,7 +1,7 @@
 # Project Status
 
 > **Last updated:** 2026-02-22
-> **Updated by:** Claude (branded confirmation modal #56, count-up animation restore, blurred masked chart, closed #14 per-user isolation)
+> **Updated by:** Claude (mobile responsive layout #63)
 
 ## Current Phase
 
@@ -334,6 +334,23 @@
 - Matches Reports page pattern; `pointer-events-none` prevents tooltip data leaks
 - Smooth CSS transition (`transition-all duration-300`) between blurred and clear states
 
+### Mobile Responsive Layout (Issue #63)
+
+- **`src/composables/useBreakpoint.ts`** — Reactive `isMobile` / `isTablet` / `isDesktop` refs using `matchMedia` with singleton listeners, SSR-safe defaults
+- **`src/components/common/MobileBottomNav.vue`** — Fixed bottom tab bar (4 tabs: Nook, Accounts, Goals, Pod) with safe area insets, Heritage Orange active state, dark mode support
+- **`src/components/common/MobileHamburgerMenu.vue`** — Full-screen slide-in overlay from left with Deep Slate background, brand logo, controls section (member filter, privacy toggle, language selector, currency chips), all 9 nav items, user profile card, security indicators footer. Closes on backdrop click, Escape key, and route change
+- **`src/components/common/AppHeader.vue`** — Mobile: hamburger button + greeting/page title + notification bell. Desktop: unchanged (all controls preserved)
+- **`src/App.vue`** — Sidebar hidden on mobile (`v-if="isDesktop"`), bottom nav shown on mobile, hamburger menu wired up, reduced mobile padding (`p-4 md:p-6`), bottom padding clearance (`pb-24`)
+- **`src/components/ui/BaseModal.vue`** — `fullscreenMobile` prop: removes rounded corners and max-width on mobile viewports
+- **`src/constants/navigation.ts`** — `MobileTabDef` interface and `MOBILE_TAB_ITEMS` constant (4 tabs)
+- **`src/services/translation/uiStrings.ts`** — 7 new i18n keys: `mobile.nook`, `mobile.pod`, `mobile.menu`, `mobile.closeMenu`, `mobile.navigation`, `mobile.controls`, `mobile.viewingAll`
+- **Responsive page pass** — Fixed hardcoded grid/width classes across 5 pages:
+  - TransactionsPage: `grid-cols-2` → `grid-cols-1 md:grid-cols-2` (2 form modals)
+  - GoalsPage: `grid-cols-2` → `grid-cols-1 md:grid-cols-2` (2 form modals)
+  - AssetsPage: `grid-cols-2` → `grid-cols-1 md:grid-cols-2` (card value display)
+  - ReportsPage: `w-64`/`w-48`/`w-40` → `w-full md:w-*` (4 fixed-width selects)
+  - FamilyPage: `grid-cols-2`/`grid-cols-3` → responsive variants (4 form grids)
+
 ### Recent Fixes
 
 - **Multi-family isolation hardening** — Fixed cross-family data leakage when authenticated user's familyId could not be resolved:
@@ -480,3 +497,4 @@ _(None currently tracked)_
 | 2026-02-22 | Full i18n string extraction                                | All ~200 hardcoded UI strings moved to uiStrings.ts; project rule: no hardcoded text in templates                         |
 | 2026-02-22 | Plans archive in docs/plans/                               | Accepted plans saved before implementation for historical reference and future context                                    |
 | 2026-02-22 | Performance reference document                             | Client-side resource boundaries, growth projections, and mitigation strategies documented                                 |
+| 2026-02-22 | Mobile responsive layout (#63)                             | Hamburger menu + 4-tab bottom nav + breakpoint composable; sidebar hidden on mobile; responsive page grids                |
