@@ -399,7 +399,7 @@
 - Fixed E2E tests to switch to transactions tab before interacting with elements
 - Switched from idb library to native IndexedDB APIs
 
-### AWS Infrastructure & Deployment
+### AWS Infrastructure & Deployment (Issue #7) — Closed
 
 - **Terraform IaC** (`infrastructure/`) — Modular Terraform configuration with S3 backend + DynamoDB locking
   - `frontend` module: S3 bucket (CloudFront OAC), CloudFront distribution (HTTPS, gzip, SPA routing), ACM cert (DNS-validated), Route53 A/AAAA records
@@ -409,7 +409,7 @@
   - `deploy` job: S3 sync + CloudFront cache invalidation (only runs after tests pass)
   - All secrets (Cognito IDs, AWS credentials, S3 bucket, CloudFront ID) stored in GitHub Secrets
 - **Live at** `https://beanies.family` (and `https://www.beanies.family`)
-- Issues closed: #8, #9, #10, #11, #12, #13
+- All sub-issues closed: #8, #9, #10, #11, #12, #13, #14
 
 ## In Progress
 
