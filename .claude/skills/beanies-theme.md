@@ -513,9 +513,60 @@ The setup wizard (`src/pages/SetupPage.vue`) uses a 3-step warm welcome flow:
 
 ---
 
+## Login & Authentication Flow — The Pod Journey
+
+The v6 UI framework introduces a **six-screen authentication flow** built around the Pod concept (an encrypted `.beanpod` data file). All screens are defined in `docs/brand/beanies-ui-framework-proposal-v6.html`.
+
+### Screen Flow
+
+| Step | Screen | Route | Purpose |
+|------|--------|-------|---------|
+| 0A | Welcome Gate | `/` | Three clear paths: sign in, create pod, join pod |
+| 0B | Load Your Pod | `/load` | File picker + drag-drop zone + cloud storage connectors |
+| 0B-2 | Unlock Your Pod | `/unlock` | Decrypt the loaded file with pod password |
+| 0B-3 | Pick Your Bean | `/who` | Select family member from avatar grid |
+| 0C | Create a New Pod | `/new-pod` | 3-step wizard: name/password → storage → invite |
+| 0D | Join an Existing Pod | `/join` | Enter family code or paste magic link |
+
+### Welcome Gate (0A)
+
+Three horizontal cards: "Sign in to your pod" (white), "Create a new pod!" (Heritage Orange gradient, primary CTA), "Join an existing pod" (white, Sky Silk icon). Footer trust badges: "End-to-End Encrypted", "Bank-Grade Security", "Built with Love".
+
+### Load Your Pod (0B)
+
+"The most philosophically important screen" — replaces traditional login with file loading. Large dashed-border file drop zone with Heritage Orange upload icon. Accepts `.beanpod` files. Cloud storage connectors: Google Drive, Dropbox, iCloud. Three security messaging cards at bottom with tinted backgrounds.
+
+### Unlock Your Pod (0B-2)
+
+Compact centered card (400px). Deep Slate lock icon. Green checkmark showing loaded filename. Single password field. CTA: "Unlock Pod". Footer: "This password decrypts your local data. We don't store or recover it."
+
+### Pick Your Bean (0B-3)
+
+Wide card (520px) showing pod name and all family members. **Large 88px circular avatars** with gradient backgrounds. Green dot = onboarded/ready (password or passkey/biometric). Heritage Orange "+" = setup needed. Auth hint: "Onboarded beans can sign in with their password or passkey."
+
+### Create New Pod (0C)
+
+3-step wizard: (1) Pod Name + Your Name/Role + Pod Password, (2) Choose Storage (Google Drive, Dropbox, iCloud, Local — branded icons with Heritage Orange selected border), (3) Add Beans (invite family members). CTA: "Create My Pod".
+
+### Join Pod (0D)
+
+Single input accepting `BEAN-XXXX` code or `beanies.family/join/...` link. Dark "What happens next?" info card with numbered steps. CTA: "Join My Family's Pod". After verification → unlock → pick bean.
+
+### Key Design Decisions
+
+- **File format:** `.beanpod` encrypted files (not `.json`)
+- **Encryption:** Always mandatory, AES-256 — no option to skip
+- **Member auth:** Per-member password or passkey/biometric (passkeys are future phase)
+- **No server accounts:** The file IS the auth database
+- **Password recovery:** Explicitly unrecoverable — "We don't store or recover it"
+- **Invite flow:** Users arriving via invite link skip the Welcome Gate entirely
+
+---
+
 ## Reference
 
 - Full CIG v2: `docs/brand/beanies-cig-v2.html`
+- UI framework proposal (v6): `docs/brand/beanies-ui-framework-proposal-v6.html`
 - UI framework proposal (v5): `docs/brand/beanies-ui-framework-proposal-v5.html`
 - Brand assets: `public/brand/`
 - Issue #22: Full rebranding task tracking

@@ -443,23 +443,32 @@
 - [ ] Responsive design polish
 - [ ] Financial forecasting / projections page
 
-## v5 UI Framework Proposal
+## v6 UI Framework Proposal
 
-A v5 UI framework proposal has been uploaded to `docs/brand/beanies-ui-framework-proposal-v5.html`, superseding v4 with expanded login/onboarding screens and design refinements. The v3 proposal (`beanies-ui-framework-proposals-v3.html`) has been removed as it is no longer relevant.
+A v6 UI framework proposal has been uploaded to `docs/brand/beanies-ui-framework-proposal-v6.html`, superseding v5 with detailed login flow screens for the new file-based authentication model. The v3 proposal was previously removed as obsolete.
 
-v5 adds a split login/auth flow (Proposals 00a–00d: Welcome Gate, Sign In, Create Pod, Join Pod) and updated onboarding screens. All previous v4 screens are retained.
+v6 introduces a **six-screen authentication flow** built around the Pod concept (encrypted `.beanpod` data files):
+
+- **00a: Welcome Gate** — Three paths: sign in, create pod, join pod
+- **00b: Load Your Pod** — File picker + drag-drop zone + cloud storage connectors (Google Drive, Dropbox, iCloud)
+- **00b-2: Unlock Your Pod** — Decrypt loaded file with pod password
+- **00b-3: Pick Your Bean** — Family member selection with 88px avatars and onboarding status indicators
+- **00c: Create a New Pod** — 3-step wizard (name/password → storage → invite)
+- **00d: Join an Existing Pod** — Family code or magic link entry
+
+Additionally, v6 includes all previous v4/v5 screens: Dashboard, Accounts (card + list), Budgets, Transactions, Onboarding, Family Hub, Mobile (4 phone mockups), Landing Page, and Settings.
 
 | Issue | Screen                                                               | Status     |
 | ----- | -------------------------------------------------------------------- | ---------- |
 | #68   | Budget page — family budget tracking with category budgets           | New screen |
-| #69   | Login page UI redesign — Welcome Gate + Sign In per v5 proposal      | Redesign   |
+| #69   | Login page UI redesign — Welcome Gate + full auth flow per v6        | Redesign   |
 | #70   | Accounts page redesign — Assets/Liabilities hero + Cards/List toggle | Redesign   |
 | #71   | Transactions page — full ledger view                                 | Redesign   |
 | #72   | Landing page — public-facing hero page                               | New screen |
 | #73   | Family Hub — 3-column layout with calendar and events                | Redesign   |
-| #62   | Onboarding redesign — v5 welcome flow with illustrations             | Redesign   |
+| #62   | Onboarding redesign — v6 welcome flow with illustrations             | Redesign   |
 
-Existing issues updated with v5 references: #60, #61, #62, #69.
+Existing issues updated with v5/v6 references: #60, #61, #62, #69.
 
 ## Future Phases
 
@@ -497,7 +506,7 @@ _(None currently tracked)_
 | 2026-02-17 | Global settings (theme, language, rates) in registry DB    | Device-level preferences survive family switching                                                                         |
 | 2026-02-22 | File-based auth replaces Cognito (ADR-014)                 | PBKDF2 password hashes in data file; true local-first, ~165KB bundle reduction, no cloud auth infrastructure              |
 | 2026-02-18 | File-first architecture: encrypted file as source of truth | Security value proposition, user data control, IndexedDB is ephemeral                                                     |
-| 2026-02-18 | Encryption enabled by default for new data files           | Secure by default, users can opt out with explicit warning                                                                |
+| 2026-02-18 | Encryption enabled by default for new data files           | Secure by default; upgraded to mandatory (no opt-out) on 2026-02-22                                                       |
 | 2026-02-18 | Auto-sync always on (no toggle)                            | Simplifies UX, data file always stays current                                                                             |
 | 2026-02-19 | Rebranded to beanies.family (Issue #22)                    | Heritage Orange + Deep Slate palette, Outfit + Inter fonts, squircles                                                     |
 | 2026-02-20 | Centralized icon system (Issue #44)                        | Single source of truth for ~72 icons, brand-enforced stroke style                                                         |
@@ -509,6 +518,8 @@ _(None currently tracked)_
 | 2026-02-21 | Sidebar redesign — Deep Slate + emoji nav (Issue #59)      | Permanent dark sidebar, emoji icons, nav extracted to shared constant for mobile reuse                                    |
 | 2026-02-21 | v4 UI framework proposal uploaded                          | New screens: Budget (#68), Login UI (#69), Landing (#72). Redesigns: Accounts (#70), Transactions (#71), Family Hub (#73) |
 | 2026-02-22 | v5 UI framework proposal uploaded, v3 removed              | v5 adds split login flow (Welcome Gate, Sign In, Create Pod, Join Pod) + updated onboarding. v3 deleted as obsolete       |
+| 2026-02-22 | v6 UI framework proposal uploaded                          | v6 adds detailed login screens (Load Pod, Unlock Pod, Pick Bean) for file-based auth. Encryption mandatory, no skip       |
+| 2026-02-22 | Encryption made mandatory for all data files               | No option to skip encryption during setup or disable it in settings. All `.beanpod` files are always AES-256 encrypted    |
 | 2026-02-21 | Header redesign — seamless icon-only controls (#67)        | Page titles in header (not in views), no border/bg, squircle icon-only controls, notification bell, avatar-only profile   |
 | 2026-02-21 | Net worth chart via transaction replay (#66)               | Option A (replay backwards from current balances) chosen over snapshot approach for MVP simplicity                        |
 | 2026-02-21 | PNG brand avatars replace inline SVGs (#65)                | Hand-crafted PNGs are more expressive; member differentiation via colored ring + pastel background                        |
