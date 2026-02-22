@@ -26,8 +26,34 @@ resource "aws_cognito_user_pool" "main" {
   verification_message_template {
     default_email_option  = "CONFIRM_WITH_LINK"
     email_subject         = "beanies.family — Verify your email"
-    email_message_by_link = "Welcome to beanies.family! Click {##here##} to verify your email address."
     email_subject_by_link = "beanies.family — Verify your email"
+    email_message_by_link = <<-HTML
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background-color:#F8F9FA;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F8F9FA;padding:32px 16px;">
+<tr><td align="center">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+<tr><td style="background-color:#2C3E50;padding:28px 32px;text-align:center;">
+<img src="https://beanies.family/brand/beanies_celebrating_line_transparent_600x600.png" alt="beanies" width="120" style="display:block;margin:0 auto 12px;" />
+<span style="font-size:28px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">beanies</span><span style="font-size:28px;font-weight:700;color:#F15D22;letter-spacing:-0.5px;">.family</span>
+</td></tr>
+<tr><td style="padding:32px;">
+<h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#2C3E50;">Welcome to the family!</h1>
+<p style="margin:0 0 24px;font-size:15px;color:#5a6a7a;line-height:1.5;">You are one step away from getting started. Verify your email address to activate your account.</p>
+<p style="text-align:center;margin:0 0 24px;">{##Verify my email##}</p>
+<p style="margin:0;font-size:13px;color:#8899aa;line-height:1.5;text-align:center;">After verifying, <a href="https://beanies.family/login" style="color:#F15D22;text-decoration:none;font-weight:500;">return to beanies.family</a> to sign in and complete your setup.</p>
+</td></tr>
+<tr><td style="padding:20px 32px;border-top:1px solid #f0f0f0;text-align:center;">
+<p style="margin:0;font-size:12px;color:#aabbcc;font-style:italic;">every bean counts</p>
+</td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>
+    HTML
   }
 
   # Schema attributes
