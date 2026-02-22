@@ -449,8 +449,73 @@ Security is foundational but should feel safe, never scary. Security UI communic
 
 ---
 
+## v4 Component Reference
+
+Dashboard and shared components implementing the Nook UI design system. Use these as patterns when building new views.
+
+### Dashboard Components (`src/components/dashboard/`)
+
+| Component | Purpose | Key Patterns |
+|-----------|---------|-------------|
+| `NetWorthHeroCard.vue` | Deep Slate gradient hero with Chart.js sparkline, time period pills, change indicators | Gradient bg, Outfit typography, privacy blur on chart, count-up animation |
+| `SummaryStatCard.vue` | Income/Expenses/Cash Flow stat cards with tinted icon containers | Tinted squircle icons (38px), hover lift, count-up animation, privacy masking |
+| `GoalProgressItem.vue` | Goal with progress bar, deadline, and percentage | Heritage Orange → Terracotta gradient bar, Outfit percentages |
+| `FamilyBeanRow.vue` | Horizontal scroll of family member avatars with role labels | BeanieAvatar with colored ring, "Add Bean" button |
+| `RecurringSummaryWidget.vue` | Monthly recurring income/expenses summary | BaseCard with stat rows, privacy masking |
+| `ActivityItem.vue` | Single activity/transaction row | Icon + description + amount + time |
+
+### UI Components (`src/components/ui/`)
+
+| Component | Purpose |
+|-----------|---------|
+| `BaseButton.vue` | Primary/secondary/danger/ghost/outline variants, rounded-2xl |
+| `BaseCard.vue` | Rounded-3xl card with optional title and shadow |
+| `BaseInput.vue` | Rounded-xl input with label, error, hint |
+| `BaseSelect.vue` | Rounded-xl select with grouped options support |
+| `BaseCombobox.vue` | Searchable single-select with "Other" custom entry |
+| `BaseModal.vue` | Rounded-3xl modal with teleport, escape key, backdrop |
+| `BaseMultiSelect/` | Multi-select dropdown with scoped slots |
+| `BeanieIcon.vue` | Universal icon component (stroke-width 1.75, round joins) |
+| `BeanieAvatar.vue` | PNG avatar with colored ring + pastel background |
+| `BeanieSpinner.vue` | Brand spinner ("counting beans...") |
+| `ConfirmModal.vue` | Branded confirmation dialog (danger/info variants) |
+| `CelebrationOverlay.vue` | Toast and modal celebrations |
+| `EmptyStateIllustration.vue` | Beanie character empty state illustrations |
+
+### Shared Constants
+
+| File | Purpose |
+|------|---------|
+| `src/constants/icons.ts` | ~72 beanie-styled SVG icon definitions |
+| `src/constants/navigation.ts` | Shared `NavItemDef[]` for sidebar + future mobile nav |
+| `src/constants/avatars.ts` | Avatar variant → PNG path mappings |
+| `src/constants/institutions.ts` | 22 predefined global banks for combobox |
+
+---
+
+## Onboarding / Setup Design
+
+The setup wizard (`src/pages/SetupPage.vue`) uses a 3-step warm welcome flow:
+
+| Step | Title | Content |
+|------|-------|---------|
+| 1 | Create Your Profile | Name, email, gender, age group, avatar preview |
+| 2 | Set Your Preferences | Base currency selector |
+| 3 | Secure Your Data | File creation with encryption password |
+
+### Design Patterns
+
+- **Step indicator:** Horizontal dots with Heritage Orange active state
+- **Navigation:** Back/Next buttons (ghost + primary), disabled until validation passes
+- **Brand voice:** Warm CTAs ("Let's get you set up"), security reassurance bullets using `beanies_impact_bullet_transparent_192x192.png`
+- **Footer note:** "Your data is encrypted and stored in a file you control — not on our servers."
+- **Celebration:** On completion, fires `celebrate('setup-complete')` modal
+
+---
+
 ## Reference
 
 - Full CIG v2: `docs/brand/beanies-cig-v2.html`
+- UI framework proposal (v4): `docs/brand/beanies-ui-framework-proposal-v4.html`
 - Brand assets: `public/brand/`
 - Issue #22: Full rebranding task tracking
